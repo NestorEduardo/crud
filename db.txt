@@ -1,0 +1,173 @@
+USE [CRUDTEST]
+GO
+/****** Object:  Table [dbo].[Cities]    Script Date: 29/1/2019 5:19:35 a. m. ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Cities](
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[Description] [varchar](25) NOT NULL,
+	[CountryID] [int] NOT NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Countries]    Script Date: 29/1/2019 5:19:35 a. m. ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Countries](
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[Description] [varchar](25) NOT NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[People]    Script Date: 29/1/2019 5:19:35 a. m. ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[People](
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[Document] [varchar](11) NOT NULL,
+	[FirstName] [varchar](20) NOT NULL,
+	[LastName] [varchar](20) NOT NULL,
+	[CountryID] [int] NOT NULL,
+	[CityID] [int] NOT NULL
+) ON [PRIMARY]
+GO
+ALTER TABLE [dbo].[People] ADD  DEFAULT ((1)) FOR [CountryID]
+GO
+ALTER TABLE [dbo].[People] ADD  DEFAULT ((1)) FOR [CityID]
+GO
+ALTER TABLE [dbo].[Cities]  WITH CHECK ADD FOREIGN KEY([CountryID])
+REFERENCES [dbo].[Countries] ([ID])
+GO
+ALTER TABLE [dbo].[People]  WITH CHECK ADD FOREIGN KEY([CityID])
+REFERENCES [dbo].[Cities] ([ID])
+GO
+ALTER TABLE [dbo].[People]  WITH CHECK ADD FOREIGN KEY([CountryID])
+REFERENCES [dbo].[Countries] ([ID])
+GO
+/****** Object:  StoredProcedure [dbo].[AddPerson]    Script Date: 29/1/2019 5:19:35 a. m. ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE procedure [dbo].[AddPerson]         
+(        
+    @Document VARCHAR(11),         
+    @FirstName VARCHAR(20),        
+    @LastName VARCHAR(20),        
+    @CityID INT,
+	@CountryID INT 
+)        
+as         
+Begin         
+    Insert into People (Document, FirstName,LastName, CityID, CountryID)         
+    Values (@Document,@FirstName,@LastName, @CityID, @CountryID)         
+End
+GO
+/****** Object:  StoredProcedure [dbo].[DeletePerson]    Script Date: 29/1/2019 5:19:35 a. m. ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE procedure [dbo].[DeletePerson]       
+(        
+   @ID int        
+)        
+as         
+begin        
+   Delete from People where ID=@ID        
+End
+GO
+/****** Object:  StoredProcedure [dbo].[GETCities]    Script Date: 29/1/2019 5:19:35 a. m. ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[GETCities](
+    @CountryID INT                
+
+)
+
+
+as      
+Begin      
+   SELECT * FROM Cities WHERE CountryID = @CountryID ORDER BY ID
+End
+GO
+/****** Object:  StoredProcedure [dbo].[GetCountries]    Script Date: 29/1/2019 5:19:35 a. m. ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE procedure [dbo].[GetCountries]      
+as      
+Begin      
+   SELECT * FROM Countries ORDER BY ID
+End
+GO
+/****** Object:  StoredProcedure [dbo].[GetPeoploe]    Script Date: 29/1/2019 5:19:35 a. m. ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE procedure [dbo].[GetPeoploe]      
+as      
+Begin      
+    select p.ID, p.Document, p.FirstName, p.LastName, p.CountryID, p.CityID,
+	ci.Description as 'City', co.Description as 'Country'
+    from People p
+	JOIN Cities ci on ci.ID = p.CityID
+	JOIN Countries co on co.ID = p.CountryID
+    order by p.ID      
+End
+GO
+/****** Object:  StoredProcedure [dbo].[GetPerson]    Script Date: 29/1/2019 5:19:35 a. m. ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+Create procedure [dbo].[GetPerson]         
+(        
+    @ID INT                
+)        
+as         
+Begin         
+   SELECT * FROM People WHERE ID = @ID     
+End
+GO
+/****** Object:  StoredProcedure [dbo].[UpdatePerson]    Script Date: 29/1/2019 5:19:35 a. m. ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE procedure [dbo].[UpdatePerson]        
+(        
+   @ID INTEGER ,      
+   @Document VARCHAR(11),         
+    @FirstName VARCHAR(20),        
+    @LastName VARCHAR(20),        
+    @City VARCHAR(20)         
+)        
+as        
+begin        
+   Update People         
+   set Document=@Document,        
+   FirstName=@FirstName,        
+   LastName=@LastName,      
+    City =@City        
+   where ID=@ID        
+End
+GO
