@@ -1,0 +1,35 @@
+﻿<h1>Personas</h1>
+
+<p *ngIf="!people"><em>Cargando...</em></p>
+
+<p>
+    <a [routerLink]="['create-person']" class="btn btn-primary">Agregar</a>
+</p>
+
+<table class='table' *ngIf="people">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Documento</th>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Ciudad</th>
+            <th>Pais</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let person of people">
+            <td>{{ person.id }}</td>
+            <td>{{ person.document }}</td>
+            <td>{{ person.firstName }}</td>
+            <td>{{ person.lastName }}</td>
+            <td>{{ person.city }}</td>
+            <td>{{ person.country }}</td>
+            <td>
+            <td>
+                <a [routerLink]="['/person/edit/', person.id]">Editar</a> |
+                <a [routerLink]="" (click)="delete(person.id)">Eliminar</a>
+            </td>
+        </tr>
+    </tbody>
+</table>
